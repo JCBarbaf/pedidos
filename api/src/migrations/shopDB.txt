@@ -1,0 +1,563 @@
+01-LANGUAGES - FK:X - Created:T
+
+	id (INT) (PK, NN, AI)
+	alias (VARCHAR) (NN)
+	name (VARCHAR) (NN)
+	visible (BOOLEAN) (DEFAULT 0)
+	createdAt (DATETIME) (NN)
+	updatedAt (DATETIME) (NN)
+	deletedAt (DATETIME)
+
+02-COUNTRIES - FK:X - Created:T
+
+	id (INT) (PK, NN, AI)
+	name (VARCHAR) (NN)
+	iso2 (VARCHAR) (NN)
+	iso3 (VARCHAR) (NN)
+	visible (BOOLEAN) (DEFAULT 1)
+	createdAt (DATETIME) (NN)
+	updatedAt (DATETIME) (NN)
+	deletedAt (DATETIME)
+
+03-CITIES - FK:✓ - ConTo:02 - Created:T
+
+	id (INT) (PK, NN, AI)
+	--countryId (INT) (NN)
+	name (VARCHAR) (NN)
+	createdAt (DATETIME) (NN)
+	updatedAt (DATETIME) (NN)
+	deletedAt (DATETIME)
+
+04-DIAL_CODES - FK:✓ - ConTo:02 - Created:T
+
+	id (INT) (PK, NN, AI)
+	--countryId (INT) (NN)
+	dialCode (VARCHAR) (NN)
+	createdAt (DATETIME) (NN)
+	updatedAt (DATETIME) (NN)
+	deletedAt (DATETIME)
+
+05-TAXES - FK:✓ - ConTo:02 - Created:T
+
+	id (INT) (PK, NN, AI)
+	--countryId (INT) (NN)
+	type (VARCHAR) (NN)
+	rate (INT) (NN)
+	multiplier (DECIMAL) (NN)
+	current (BOOLEAN) (DEFAULT 1)
+	createdAt (DATETIME) (NN)
+	updatedAt (DATETIME) (NN)
+	deletedAt (DATETIME)
+
+--------------------------------------------------------------------------------------------
+
+06-COMPANIES - FK:✓ - ConTo:02-03-04 - Created:T
+
+	id (INT) (PK, NN, AI)
+  --countryId (INT) (NN)
+  --cityId (INT) (NN)
+  --dialCodeId (INT) (NN)
+  postalCode (VARCHAR) (NN)
+  fiscalAddress (VARCHAR) (NN)
+  comercialAddress (VARCHAR) (NN)
+  telephone (VARCHAR)
+  email (VARCHAR) (NN)
+  web (VARCHAR)
+  fiscalName (VARCHAR) (NN)
+  comercialName (VARCHAR) (NN)
+  vat (VARCHAR) (NN)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+07-USERS - FK:X - Created:T
+
+  id (INT) (PK, NN, AI)
+  name (VARCHAR) (NN)
+  email (VARCHAR) (NN) (U)
+  password (VARCHAR) (NN)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+
+08-CUSTOMERS - FK:✓ - ConTo:02-03-04 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --countryId (INT) (NN)
+  --cityId (INT) (NN)
+  --dialCodeId (INT) (NN)
+  postalCode (VARCHAR) (NN)
+  address (VARCHAR) (NN)
+  name (VARCHAR) (NN)
+  surname (VARCHAR) (NN)
+  telephone (VARCHAR) (NN)
+  email (VARCHAR) (NN) (U)
+  password (VARCHAR) (NN)
+  vat (VARCHAR) 
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+--------------------------------------------------------------------------------------------
+
+09-FAQS - FK:X - ConTo: - Created:T
+
+  id (INT) (PK, NN, AI)
+  name (VARCHAR) (NN)
+  order (INT) (NN)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+10-MENUS - FK:X - ConTo: - Created:T
+
+  id (INT) (PK, NN, AI)
+  name (VARCHAR) (NN)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+11-MENU_ITEMS - FK:✓ - ConTo:10-35-36 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --menuId (INT) (NN)
+  --localeSeoId (INT)
+  --localeSeoSlugId (INT)
+  parent (INT)
+  customUrl (VARCHAR)
+  private (BOOLEAN) (NN) (DEFAULT 0)
+  order (INT)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+--------------------------------------------------------------------------------------------
+
+
+12-PRODUCT_CATEGORIES - FK:X - ConTo: - Created:T
+
+  id  (INT) (NN)
+  name (VARCHAR) (NN)
+  visible (BOOLEAN) (DEFAULT 1)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+13-PRODUCT_CATEGORY_RELATIONS - FK:✓ - ConTo:12-14 - Created:T
+
+  id  (INT) (NN)
+  --productCategoryId (INT) (NN)
+  --productId  (INT) (NN)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+14-PRODUCTS - FK:X - ConTo: - Created:T
+
+  id (INT) (PK, NN, AI)
+  name (VARCHAR) (NN)
+  featured (BOOLEAN) (DEFAULT 0)
+  visible (BOOLEAN) (DEFAULT 1)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+15-PRICES - FK:✓ - ConTo:14-05 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --productId (INT) (NN)
+  --taxId (INT) (NN)
+  basePrice (DECIMAL) (NN)
+  current (BOOLEAN) (DEFAULT 1)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+16-PRICE_DISCOUNTS - FK:✓ - ConTo:15 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --priceId (INT) (NN)
+  percentage (INT) (NN)
+  multiplier (DECIMAL) (NN)
+  current (BOOLEAN) (DEFAULT 1)
+  startsAt (DATETIME) 
+  endsAt (DATETIME) 
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+17-COUPONS - FK:X - ConTo: - Created:T
+
+  id (INT) (PK, NN, AI)
+  name (VARCHAR) (NN)
+  code (VARCHAR) (NN)
+  percentage (INT) (NN)
+  multiplier (DECIMAL) (NN)
+  current (BOOLEAN) (DEFAULT 1)
+  startsAt (DATETIME) 
+  endsAt (DATETIME) 
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+--------------------------------------------------------------------------------------------
+
+18-IMAGE_CONFIGURATIONS - FK:X - ConTo: - Created:T
+
+  id (INT) (PK, NN, AI)
+  entity (VARCHAR) (NN)
+  name (VARCHAR) (NN)
+  mediaQuery (VARCHAR) (NN)
+  widthPx (INT) (NN)
+  heightPx (INT) (NN)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+19-IMAGES - FK:✓ - ConTo:18 - Created:T
+
+  id (INT) (PK, NN, AI)
+  entity (VARCHAR) (NN)
+  -?entityId (INT) (NN)
+  --imageConfigurationId (INT) (NN)
+  name (VARCHAR) (NN)
+  originalFilename (VARCHAR) (NN)
+  resizedFilename (VARCHAR) (NN)
+  title (VARCHAR) (NN)
+  alt (VARCHAR) (NN)
+  languageAlias (VARCHAR) (NN)
+  mediaQuery (VARCHAR) (NN)
+  latencyMS (INT) (NN)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+-------------------------------------------------------------------------------------------
+
+20-LOCALES - FK:X - ConTo: - Created:T
+                                                        
+  id (INT) (PK, NN, AI)                                    
+  languageAlias (VARCHAR) (NN)                            
+  entity (VARCHAR) (NN)                                    
+  -?entityId (INT) (NN)                                      
+  key (VARCHAR) (NN)
+  value (TEXT) (NN)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+--------------------------------------------------------------------------------------------
+
+21-PAYMENT_METHODS - FK:X - ConTo: - Created:T
+
+  id (INT) (PK, NN, AI)
+  name (VARCHAR) (NN)
+  configuration (JSON) (NN)
+  visible (BOOLEAN) (DEFAULT 1)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+22-CARTS - FK:✓ - ConTo:08-39 - Created:T
+
+  id (INT) (PK, NN, AI)
+  uuid (UUID) (NN)
+  --customerId (INT) 
+  --fingerprintId (INT) (NN)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+23-CART_DETAILS - FK:✓ - ConTo:22-14-20-15-16-05 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --cartId (INT) (NN)
+  --productId (INT) (NN)
+  --localeId (INT) (NN)
+  --priceId (INT) (NN)
+  --priceDiscountId (INT) (NN)
+  --taxId (INT) (NN)
+  basePrice (DECIMAL) (NN)
+  taxPrice (DECIMAL) (NN)
+  quantity (INT) (NN)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+24-SALES - FK:✓ - ConTo:22-08-21-17 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --cartId (INT) (NN)
+  --customerId (INT) (NN)
+  --paymentMethodId (INT) (NN)
+  --couponId (INT) (NN)
+  reference (VARCHAR) (NN) (UNIQUE)
+  totalPrice (DECIMAL) (NN)
+  totalBasePrice (DECIMAL) (NN)
+  totalTaxPrice (DECIMAL) (NN)
+  saleDate (DATE) (NN)
+  saleTime (TIME) (NN)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+25-SALE_DETAILS - FK:✓ - ConTo:24-14-20-15-16-05 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --saleId (INT) (NN)
+  --productId (INT) (NN)
+  --localeId (INT) (NN)
+  --priceId (INT) (NN)
+  --priceDiscountId (INT) (NN)
+  --taxId (INT) (NN)
+  basePrice (DECIMAL) (NN)
+  taxPrice (DECIMAL) (NN)
+  quantity (INT) (NN)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+26-SALE_ERRORS - FK:✓ - ConTo:21-08-22 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --paymentMethodId (INT) (NN)
+  --customerId (INT) (NN)
+  --cartId (INT) (NN)
+  errorCode (VARCHAR) (NN)
+  errorMessage (TEXT) 
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+27-RETURNS - FK:✓ - ConTo:24-08-21 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --saleId (INT) (NN)
+  --customerId (INT) (NN)
+  --paymentMethodId (INT) (NN)
+  reference (VARCHAR) (NN)
+  totalPrice (DECIMAL) (NN)
+  totalBasePrice (DECIMAL) (NN)
+  totalTaxPrice (DECIMAL) (NN)
+  returnDate (DATE) (NN)
+  returnTime (TIME) (NN) 
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+28-RETURN_DETAILS - FK:✓ - ConTo:27-14-20-15-05-16 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --returnId (INT) (NN)
+  --productId (INT) (NN)
+  --localeId (INT) (NN)
+  --priceId (INT) (NN)
+  --taxId (INT) (NN)
+  --priceDiscountId (INT) (NN)
+  basePrice (DECIMAL) (NN)
+  taxPrice (DECIMAL) (NN)
+  quantity (INT) (NN)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+29-RETURN_ERRORS - FK:✓ - ConTo:21-08-24 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --paymentMethodId (INT) (NN)
+  --customerId (INT) (NN)
+  --saleId (INT) (NN)
+  errorCode (VARCHAR) (NN)
+  errorMessage (TEXT)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+30-TICKETS - FK:✓ - ConTo:08-24-27 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --customerId (INT) (NN)
+  --saleId (INT) 
+  --returnId (INT) 
+  reference (VARCHAR) (NN)
+  path (VARCHAR) (NN)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+31-INVOICES - FK:✓ - ConTo:08-24-27 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --customerId (INT) (NN)
+  --saleId (INT)
+  --returnId (INT) 
+  reference (VARCHAR) (NN)
+  path (VARCHAR) (NN)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+-----------------------------------------------------------------------------------------
+
+32-EMAILS - FK:X - ConTo: - Created:T
+
+  id (INT) (PK, NN, AI)
+  subject (VARCHAR) (NN)
+  path (VARCHAR) (NN)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+33-SENT_EMAILS - FK:✓ - ConTo:08-32 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --customerId (INT) (NN)
+  --emailId (INT) (NN)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+34-EMAIL_ERRORS * - FK:✓ - ConTo:08-32 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --customerId (INT) (NN)
+  --emailId (INT) (NN)
+  error (TEXT) 
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+-------------------------------------------------------------------------------------------
+
+35-LOCALE_SEOS - FK:X - ConTo: - Created:T
+
+  id (INT) (PK, NN, AI)
+  languageAlias (VARCHAR) (NN)
+  url (VARCHAR) (NN)
+  title (VARCHAR) (NN)  
+  description (VARCHAR)
+  redirection (BOOLEAN) (DEFAULT 0)
+  menu (BOOLEAN) (DEFAULT 1)
+  changeFrequency (VARCHAR) 
+  priority (DECIMAL)
+  sitemap (BOOLEAN) (DEFAULT 1)  www.bla.com/tienda/{slug} 
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+36-LOCALE_SEO_SLUGS - FK:✓ - ConTo:35 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --localeSeoId (INT) (NN)   
+  parentSlug (VARCHAR) (NN)
+  languageAlias (VARCHAR) (NN) 
+  relParent (VARCHAR) 
+  slug (VARCHAR) (NN) toalla-portuguesa-especial
+  key (VARCHAR) 
+  title (VARCHAR) (NN) Toalla portuguesa
+  description (VARCHAR)  Las mejores toallas del mundo
+  redirection (BOOLEAN) (DEFAULT 0)  1
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+37-LOCALE_SEO_REDIRECTS - FK:✓ - ConTo:35 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --localeSeoId (INT) (NN)
+  languageAlias (VARCHAR) (NN)
+  oldUrl (VARCHAR) (NN)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+38-LOCALE_SEO_SLUG_REDIRECTS - FK:✓ - ConTo:36 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --localeSeoSlugId (INT) (NN)
+  languageAlias (VARCHAR) (NN)
+  oldUrl (VARCHAR) (NN)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+---------------------------------------------------------------------------------------------
+
+39-FINGERPRINTS - FK:✓ - ConTo:08-03 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --customerId (INT) 
+  fingerprint (VARCHAR) (NN)
+  --cityId (INT) 
+  browser (VARCHAR) 
+  browserVersion (VARCHAR) 
+  os (VARCHAR) 
+  osVersion (VARCHAR) 
+  screenHeight (INT)
+  screenWidth (INT)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+40-CUSTOMER_TRACKINGS - FK:✓ - ConTo:08-35-36 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --customerId (INT)
+  fingerprint (VARCHAR) (NN)
+  --localeSeoId (INT) 
+  --localeSlugSeoId (INT) 
+  path (VARCHAR) (NN)
+  eventTime (DOUBLE) (NN)
+  eventName (VARCHAR) (NN)
+  event (JSON) (NN)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+41-ADMIN_TRACKINGS - FK:✓ - ConTo:07 - Created:T
+
+  id (INT) (PK, NN, AI)
+  entity (VARCHAR)(NN)
+  -?entityId (INT)(NN)
+  --userId (INT)(NN)
+  action (VARCHAR)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+42-PAGE_TRACKINGS - FK:✓ - ConTo:08-35-36 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --customerId (INT) 
+  fingerprint (VARCHAR) (NN)
+  --localeSeoId (INT)
+  --localeSlugSeoId (INT)
+  path (VARCHAR) (NN)
+  ip (VARCHAR)
+  isRobot (BOOLEAN) (DEFAULT 0)
+  startTime (DOUBLE) (NN)
+  endTime (DOUBLE) (NN)
+  latencyMS (INT)
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)
+
+43-API_TRACKINGS - FK:✓ - ConTo:08 - Created:T
+
+  id (INT) (PK, NN, AI)
+  --customerId (INT) 
+  fingerprint (VARCHAR) (NN)
+  ip (VARCHAR) 
+  isRobot (BOOLEAN) (DEFAULT 0)
+  resource (VARCHAR) (NN)
+  resourceElement (INT) 
+  method (VARCHAR) (NN)
+  httpCode (INT) (NN)
+  message (TEXT)
+  startTime (DOUBLE) (NN)
+  endTime (DOUBLE) (NN)
+  latencyMS (INT) 
+  createdAt (DATETIME) (NN)
+  updatedAt (DATETIME) (NN)
+  deletedAt (DATETIME)

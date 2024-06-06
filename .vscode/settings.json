@@ -1,0 +1,16 @@
+{
+    "liveServer.settings.port": 5502,
+    "editor.tabSize": 2,
+    "eslint.codeActionsOnSave.rules": null,
+    "editor.codeActionsOnSave":{
+      "source.fixAll.eslint": "explicit"
+    },
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact",
+        "vue",
+        "svelte",
+    ],
+}
