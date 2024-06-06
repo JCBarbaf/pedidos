@@ -24,10 +24,13 @@ app.use('/admin/login', createProxyMiddleware(options));
 options.target = 'http://localhost:5171';
 app.use('/admin', createProxyMiddleware(options));
 
-options.target = 'http://localhost:5173';
-app.use('/cuenta', createProxyMiddleware(options));
-
 options.target = 'http://localhost:5172';
-app.use('/', createProxyMiddleware(options));
+app.use('/cliente/login', createProxyMiddleware(options));
+
+options.target = 'http://localhost:5173';
+app.use('/cliente', createProxyMiddleware(options));
+
+options.target = 'http://localhost:5174';
+app.use('/cuenta', createProxyMiddleware(options));
 
 app.listen(80, '127.0.0.1');

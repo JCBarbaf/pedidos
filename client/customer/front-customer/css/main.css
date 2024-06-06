@@ -1,0 +1,39 @@
+:root {
+    --primary-color: rgb(0, 56, 168);
+    --secondary-color: rgb(94, 55, 81);
+    --tertiary-color: rgb(150, 156, 172);
+    --grey-white: rgb(187, 194, 212);
+    --grey-black: rgb(32, 39, 55);
+    --black: rgb(17, 23, 39);
+    --white: rgb(203, 219, 235);
+    --red: rgb(153, 31, 24);
+    --green: rgb(34, 156, 34);
+    --sahdow: 5px 5px 0px 0px rgba(0, 0, 0, 0.2);
+    --border: 3px solid rgba(0, 0, 0, 0.2);
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+    box-sizing: border-box;
+    overflow-x: hidden;
+    background-color: var(--black,black);
+    color: var(--white,white);
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+}
+/* Concrertos */
+.tabs {
+  display: flex;
+}
+.tab {
+  width: 100%;
+  height: 100%;
+  padding: 0 10%;
+  background-color: var(--primary-color,rgb(0, 56, 168));
+  cursor: pointer;
+}
+.tab.selected {
+  filter: brightness(0.8);
+}

@@ -1,0 +1,7 @@
+import '../components/page.js'
+import '../components/header.js'
+import '../components/title.js'
+import '../components/burger-menu.js'
+import '../components/home.js'
+import '../components/home-button.js'
+import '../components/products.js'

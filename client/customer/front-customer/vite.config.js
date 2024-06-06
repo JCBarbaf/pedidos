@@ -1,6 +1,6 @@
 export default {
-  base: '/cuenta',
+  base: '/cliente',
   server: {
-    port: 5174
+    port: 5173
   }
 }
