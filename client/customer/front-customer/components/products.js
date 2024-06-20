@@ -1,3 +1,6 @@
+import { store } from '../redux/store.js'
+import { updateCart } from '../redux/cart-slice.js'
+
 class Products extends HTMLElement {
   constructor () {
     super()
@@ -7,6 +10,7 @@ class Products extends HTMLElement {
   connectedCallback () {
     this.products = [
       {
+        id: 1,
         name: 'Buzz cola light',
         price: 10.00,
         units: 16,
@@ -14,6 +18,7 @@ class Products extends HTMLElement {
         measureUnit: 'ml'
       },
       {
+        id: 2,
         name: 'Buzz cola con limón',
         price: 10.00,
         units: 16,
@@ -21,6 +26,7 @@ class Products extends HTMLElement {
         measureUnit: 'ml'
       },
       {
+        id: 3,
         name: 'Buzz cola',
         price: 10.00,
         units: 16,
@@ -112,22 +118,9 @@ class Products extends HTMLElement {
           color: var(--primary-color, rgb(0, 56, 168));
           line-height: 0;
         }
-        .order-button {
-          width: 15rem;
-          margin: 1rem auto;
-          padding: 1rem;
-          background-color: var(--primary-color, rgb(0, 56, 168));
-          color: var(--white, rgb(203, 219, 235));
-          font: inherit;
-          border-radius: 100rem;
-          box-shadow: var(--sahdow, 5px 5px 0px 0px rgba(0, 0, 0, 0.2));
-          text-decoration: none;
-          text-align: center;
-        }
       </style>
       <div class="products">
         <div class="product-gallery"></div>
-        <a href="#" class="order-button">Ver pedido</a>
       </div>
       `
     this.products.forEach(product => {
@@ -152,7 +145,7 @@ class Products extends HTMLElement {
       add.classList.add('add')
       add.innerHTML = '+'
       number.classList.add('quantity-number')
-      number.innerHTML = '1'
+      number.innerHTML = 0
       productContainer.appendChild(name)
       productContainer.appendChild(price)
       productContainer.appendChild(details)
@@ -160,6 +153,22 @@ class Products extends HTMLElement {
       quantity.appendChild(number)
       quantity.appendChild(add)
       productContainer.appendChild(quantity)
+      add.addEventListener('click', (event) => {
+        number.innerHTML++
+        store.dispatch(updateCart({
+          ...product,
+          quantity: parseInt(number.innerHTML)
+        }))
+      })
+      substract.addEventListener('click', (event) => {
+        if (number.innerHTML > 0) {
+          number.innerHTML--
+          store.dispatch(updateCart({
+            ...product,
+            quantity: parseInt(number.innerHTML)
+          }))
+        }
+      })
       this.shadow.querySelector('.product-gallery').appendChild(productContainer)
     })
   }

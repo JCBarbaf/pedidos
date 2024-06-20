@@ -3,9 +3,12 @@ const Product = sequelizeDb.Product
 const Op = sequelizeDb.Sequelize.Op
 
 exports.create = (req, res) => {
+  console.log("------------------------------------")
+  console.log(req.body.visible)
   Product.create(req.body).then(data => {
     res.status(200).send(data)
   }).catch(err => {
+    console.log(err)
     res.status(500).send({
       message: err.errors || 'Algún error ha surgido al insertar el dato.'
     })
@@ -19,7 +22,7 @@ exports.findAll = (req, res) => {
   const offset = (page - 1) * limit
 
   Product.findAndCountAll({
-    attributes: ['id', 'name', 'featured', 'visible', 'createdAt', 'updatedAt'],
+    attributes: ['id', 'name', 'reference', 'units', 'measurementUnit', 'measurement', 'createdAt', 'updatedAt'],
     limit,
     offset,
     order: [['createdAt', 'DESC']]
@@ -33,6 +36,7 @@ exports.findAll = (req, res) => {
 
       res.status(200).send(result)
     }).catch(err => {
+      console.log(err)
       res.status(500).send({
         message: err.errors || 'Algún error ha surgido al recuperar los datos.'
       })

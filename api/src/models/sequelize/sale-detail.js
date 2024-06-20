@@ -8,95 +8,27 @@ module.exports = function (sequelize, DataTypes) {
     },
     saleId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: 'Por favor, rellena el campo "sale".'
-        }
-      }
+      allowNull: false
     },
     productId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: 'Por favor, rellena el campo "product".'
-        }
-      }
-    },
-    localeId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: 'Por favor, rellena el campo "locale".'
-        }
-      }
+      allowNull: false
     },
     priceId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: 'Por favor, rellena el campo "price".'
-        }
-      }
-    },
-    priceDiscountId: {
-      type: DataTypes.INTEGER,
-    },
-    taxId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: 'Por favor, rellena el campo "tax".'
-        }
-      }
+      allowNull: false
     },
     productName: {
       type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: 'Por favor, rellena el campo "productName".'
-        }
-      }
+      allowNull: false
     },
     basePrice: {
       type: DataTypes.DECIMAL(6, 2),
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: 'Por favor, rellena el campo "basePrice".'
-        },
-        is: {
-          args: /^[0-9]{1,6}\.[0-9]{2}$/,
-          msg: 'Por favor, añade un precio válido".'
-        }
-      }
-    },
-    taxPrice: {
-      type: DataTypes.DECIMAL(6, 2),
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: 'Por favor, rellena el campo "taxPrice".'
-        },
-        is: {
-          args: /^[0-9]{1,6}\.[0-9]{2}$/,
-          msg: 'Por favor, añade un precio válido".'
-        }
-      }
+      allowNull: false
     },
     quantity: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: 'Por favor, rellena el campo "quantity".'
-        }
-      }
+      allowNull: false
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -143,31 +75,10 @@ module.exports = function (sequelize, DataTypes) {
         ]
       },
       {
-        name: 'sale_details_localeId_fk',
-        using: 'BTREE',
-        fields: [
-          { name: 'localeId' }
-        ]
-      },
-      {
         name: 'sale_details_priceId_fk',
         using: 'BTREE',
         fields: [
           { name: 'priceId' }
-        ]
-      },
-      {
-        name: 'sale_details_priceDiscountId_fk',
-        using: 'BTREE',
-        fields: [
-          { name: 'priceDiscountId' }
-        ]
-      },
-      {
-        name: 'sale_details_taxId_fk',
-        using: 'BTREE',
-        fields: [
-          { name: 'taxId' }
         ]
       }
     ]
@@ -176,10 +87,7 @@ module.exports = function (sequelize, DataTypes) {
   SaleDetail.associate = function (models) {
     SaleDetail.belongsTo(models.Sale, { as: 'sale', foreignKey: 'saleId' })
     SaleDetail.belongsTo(models.Product, { as: 'product', foreignKey: 'productId' })
-    SaleDetail.belongsTo(models.Locale, { as: 'locale', foreignKey: 'localeId' })
     SaleDetail.belongsTo(models.Price, { as: 'price', foreignKey: 'priceId' })
-    SaleDetail.belongsTo(models.PriceDiscount, { as: 'priceDiscount', foreignKey: 'priceDiscountId' })
-    SaleDetail.belongsTo(models.Tax, { as: 'tax', foreignKey: 'taxId' })
   }
 
   return SaleDetail

@@ -8,15 +8,11 @@ class Home extends HTMLElement {
     this.links = [
       {
         name: 'Nuevo pedido',
-        url: '#'
+        url: './cliente/productos'
       },
       {
-        name: 'Hola',
-        url: '#'
-      },
-      {
-        name: 'Adios',
-        url: '#'
+        name: 'Ver pedidos',
+        url: './cliente/pedidos'
       }
     ]
     this.render()

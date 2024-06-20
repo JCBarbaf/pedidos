@@ -73,6 +73,13 @@ class Order extends HTMLElement {
           background-color: var(--secondary-color, rgb(94, 55, 81));
           input {
             width: 40%;
+            padding: 0.2rem;
+            background-color: var(--grey-white, rgb(187, 194, 212));
+            border: var(--border, 3px solid rgba(0, 0, 0, 0.2));
+            &:focus {
+              border-color: var(--green, rgb(34, 156, 34));
+              outline: none;
+            }
           }
         }
         .open-filters {
@@ -80,6 +87,7 @@ class Order extends HTMLElement {
           display: flex;
           justify-content: center;
           align-items: center;
+          gap: 0.5rem;
           padding: 0.5rem;
           background-color: var(--primary-color, rgb(0, 56, 168));
           border-top: var(--border, 3px solid rgba(0, 0, 0, 0.2));
@@ -160,6 +168,7 @@ class Order extends HTMLElement {
             </div>
           </div>
           <div class="open-filters">
+            <p>Filtrar</p>
             <svg class="arrow-down" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M58.1411 84.3343C54.3948 91.2219 44.6051 91.2219 40.8589 84.3343L8.73419 25.2723C5.1205 18.6285 9.87527 10.5 17.3753 10.5L81.6247 10.5C89.1247 10.5 93.8795 18.6285 90.2658 25.2723L58.1411 84.3343Z" fill="black"/>
             </svg>

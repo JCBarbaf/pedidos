@@ -10,15 +10,30 @@ module.exports = {
         autoIncrement: true,
         allowNull: false
       },
+      productCategoryId: {
+        type: Sequelize.INTEGER
+      },
       name: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      featured: {
-        type: Sequelize.BOOLEAN
+      reference: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      units: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
+      measurementUnit: {
+        type: Sequelize.STRING
+      },
+      measurement: {
+        type: Sequelize.INTEGER
       },
       visible: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        allowNull: false
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -31,6 +46,10 @@ module.exports = {
       deletedAt: {
         type: Sequelize.DATE
       }
+    })
+
+    await queryInterface.addIndex('products', ['productCategoryId'], {
+      name: 'products_productCategoryId_index'
     })
   },
 

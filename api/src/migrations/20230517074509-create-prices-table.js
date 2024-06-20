@@ -19,17 +19,8 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'NO ACTION'
       },
-      taxId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'taxes',
-          key: 'id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'NO ACTION'
-      },
       basePrice: {
-        type: Sequelize.DECIMAL
+        type: Sequelize.DECIMAL(10, 2)
       },
       current: {
         type: Sequelize.BOOLEAN
@@ -49,10 +40,6 @@ module.exports = {
 
     await queryInterface.addIndex('prices', ['productId'], {
       name: 'prices_productId_fk'
-    })
-
-    await queryInterface.addIndex('prices', ['taxId'], {
-      name: 'prices_taxId_fk'
     })
   },
 

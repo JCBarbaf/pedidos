@@ -10,70 +10,25 @@ module.exports = {
         autoIncrement: true,
         allowNull: false
       },
-      countryId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'countries',
-          key: 'id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'NO ACTION'
-      },
-      cityId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'cities',
-          key: 'id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'NO ACTION'
-      },
-      dialCodeId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'dial_codes',
-          key: 'id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'NO ACTION'
-      },
-      fiscalName: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      comercialName: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      vat: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      comercialAddress: {
+      commercialAddress: {
         type: Sequelize.STRING,
         allowNull: true
       },
       fiscalAddress: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
-      postalCode: {
+      commercialName: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      email: {
+      fiscalName: {
         type: Sequelize.STRING,
-        allowNull: false,
-        unique: true
+        allowNull: false
       },
-      web: {
-        type: Sequelize.STRING
-      },
-      telephone: {
-        type: Sequelize.STRING
+      vatNumber: {
+        type: Sequelize.STRING,
+        allowNull: false
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -88,17 +43,6 @@ module.exports = {
       }
     })
 
-    await queryInterface.addIndex('companies', ['countryId'], {
-      name: 'companies_countryId_fk'
-    })
-
-    await queryInterface.addIndex('companies', ['cityId'], {
-      name: 'companies_cityId_fk'
-    })
-
-    await queryInterface.addIndex('companies', ['dialCodeId'], {
-      name: 'companies_dialCodeId_fk'
-    })
   },
 
   down: async (queryInterface, Sequelize) => {

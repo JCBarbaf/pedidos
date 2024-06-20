@@ -40,9 +40,6 @@ class FaqsDataAdd extends HTMLElement {
             input {
               display: block;
             }
-            input:focus, textarea:focus {
-              outline: none;
-            }
             *::-webkit-scrollbar {
               width: 5px;
             }
@@ -113,7 +110,7 @@ class FaqsDataAdd extends HTMLElement {
               margin: 1% 0;
               padding: 1%;
             }
-            .form-field input, .form-field textarea {
+            .form-field input, .form-field textarea, .form-field select{
               width: 95%;
               height: 2rem;
               margin-top: 2%;
@@ -125,6 +122,13 @@ class FaqsDataAdd extends HTMLElement {
               border-width: 5px;
               border-radius: 5px 5px 0 0;
               resize: none;
+              &:focus {
+                outline: none;
+                border-color: var(--green, rgb(34, 156, 34));
+              }
+            }
+            .form-field select option {
+              border-radius: 0;
             }
             .invalid {
               border-color: var(--red,rgb(153, 31, 24));

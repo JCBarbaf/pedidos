@@ -1,6 +1,6 @@
 import { store } from '../../redux/store.js'
 import { removeImages, showImages } from '../../redux/images-slice.js'
-class CustomersDataAdd extends HTMLElement {
+class ProductCategoriesDataAdd extends HTMLElement {
   constructor () {
     super()
     this.shadow = this.attachShadow({ mode: 'open' })
@@ -203,20 +203,6 @@ class CustomersDataAdd extends HTMLElement {
                   <label for="user">Nombre:</label>
                   <input type="text" name="name">
                 </div>
-                <div class="form-field">
-                  <label for="user">Apellidos:</label>
-                  <input type="text" name="surname">
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-field">
-                  <label for="user">Email:</label>
-                  <input type="email" name="email">
-                </div>
-                <div class="form-field">
-                  <label for="user">Teléfono:</label>
-                  <input type="tel" name="telephone">
-                </div>
               </div>
             </div>
             <div class="tab-content" data-field="images">
@@ -332,4 +318,4 @@ class CustomersDataAdd extends HTMLElement {
   }
 }
 
-customElements.define('customers-data-add-component', CustomersDataAdd)
+customElements.define('product-categories-data-add-component', ProductCategoriesDataAdd)

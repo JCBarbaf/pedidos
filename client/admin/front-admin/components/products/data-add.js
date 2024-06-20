@@ -1,6 +1,6 @@
 import { store } from '../../redux/store.js'
 import { removeImages, showImages } from '../../redux/images-slice.js'
-class CustomersDataAdd extends HTMLElement {
+class ProductsDataAdd extends HTMLElement {
   constructor () {
     super()
     this.shadow = this.attachShadow({ mode: 'open' })
@@ -8,7 +8,13 @@ class CustomersDataAdd extends HTMLElement {
 
   connectedCallback () {
     document.addEventListener('showElement', this.handleData.bind(this))
-    this.render()
+    this.loadData().then(() => this.render())
+  }
+
+  async loadData () {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/product-categories`)
+    const data = await response.json()
+    this.categories = data.rows
   }
 
   handleData (event) {
@@ -147,6 +153,16 @@ class CustomersDataAdd extends HTMLElement {
             input[type="file"] {
               display: none;
             }
+            .checkbox {
+              flex: 0.3;
+              display: flex;
+              justify-content: flex-start;
+              align-items: center;
+              gap: 1rem;
+              input {
+                width: 1.5rem;
+              }
+            }
             /* Animaciones */
             @keyframes shake {
               0% {
@@ -200,22 +216,38 @@ class CustomersDataAdd extends HTMLElement {
             <div class="tab-content selected" data-field="principal">
               <div class="form-row">
                 <div class="form-field">
-                  <label for="user">Nombre:</label>
+                  <label for="name">Nombre:</label>
                   <input type="text" name="name">
                 </div>
                 <div class="form-field">
-                  <label for="user">Apellidos:</label>
-                  <input type="text" name="surname">
+                  <label for="user">Categoria:</label>
+                  <select name="productCategoryId">
+                    <option value="-1" selected disabled>--------------</option>
+                  </select>
                 </div>
               </div>
               <div class="form-row">
                 <div class="form-field">
-                  <label for="user">Email:</label>
-                  <input type="email" name="email">
+                  <label for="user">Referencia:</label>
+                  <input type="text" name="reference">
+                </div>
+                <div class="form-field checkbox">
+                  <input type="checkbox" name="visible">
+                  <label for="user">Visible</label>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="user">Unidades:</label>
+                  <input type="text" name="units">
                 </div>
                 <div class="form-field">
-                  <label for="user">Teléfono:</label>
-                  <input type="tel" name="telephone">
+                  <label for="user">Cantidad:</label>
+                  <input type="text" name="measurement">
+                </div>
+                <div class="form-field">
+                  <label for="user">Unidad de medida:</label>
+                  <input type="text" name="measurementUnit">
                 </div>
               </div>
             </div>
@@ -231,6 +263,13 @@ class CustomersDataAdd extends HTMLElement {
         </main>
         <image-modal-component></image-modal-component>
       `
+    const categoriesSelect = this.shadow.querySelector('[name="productCategoryId"]')
+    this.categories.forEach(category => {
+      const option = document.createElement('option')
+      option.value = category.id
+      option.innerHTML = category.name
+      categoriesSelect.appendChild(option)
+    })
     const main = this.shadow.querySelector('main')
     main.addEventListener('click', async (event) => {
       if (event.target.closest('.tab')) {
@@ -252,6 +291,7 @@ class CustomersDataAdd extends HTMLElement {
         document.dispatchEvent(new CustomEvent('showNotification'))
         const form = this.shadow.querySelector('.main-form')
         const formData = new FormData(form)
+        formData.set("visible", this.shadow.querySelector('[name="visible"]').checked)
         const formDataJson = {}
         formDataJson.images = store.getState().images.selectedImages
         for (const [key, value] of formData.entries()) {
@@ -332,4 +372,4 @@ class CustomersDataAdd extends HTMLElement {
   }
 }
 
-customElements.define('customers-data-add-component', CustomersDataAdd)
+customElements.define('products-data-add-component', ProductsDataAdd)

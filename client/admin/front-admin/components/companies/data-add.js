@@ -1,6 +1,6 @@
 import { store } from '../../redux/store.js'
 import { removeImages, showImages } from '../../redux/images-slice.js'
-class CustomersDataAdd extends HTMLElement {
+class CompaniesDataAdd extends HTMLElement {
   constructor () {
     super()
     this.shadow = this.attachShadow({ mode: 'open' })
@@ -200,22 +200,28 @@ class CustomersDataAdd extends HTMLElement {
             <div class="tab-content selected" data-field="principal">
               <div class="form-row">
                 <div class="form-field">
-                  <label for="user">Nombre:</label>
-                  <input type="text" name="name">
+                  <label for="user">Nombre comercial:</label>
+                  <input type="email" name="commercialName">
                 </div>
                 <div class="form-field">
-                  <label for="user">Apellidos:</label>
-                  <input type="text" name="surname">
+                  <label for="user">Dirección comercial:</label>
+                  <input type="text" name="commercialAddress">
                 </div>
               </div>
               <div class="form-row">
                 <div class="form-field">
-                  <label for="user">Email:</label>
-                  <input type="email" name="email">
+                  <label for="user">Nombre fiscal:</label>
+                  <input type="tel" name="fiscalName">
                 </div>
                 <div class="form-field">
-                  <label for="user">Teléfono:</label>
-                  <input type="tel" name="telephone">
+                  <label for="user">Dirección fiscal:</label>
+                  <input type="text" name="fiscalAddress">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="user">VAT:</label>
+                  <input type="tel" name="vatNumber">
                 </div>
               </div>
             </div>
@@ -332,4 +338,4 @@ class CustomersDataAdd extends HTMLElement {
   }
 }
 
-customElements.define('customers-data-add-component', CustomersDataAdd)
+customElements.define('companies-data-add-component', CompaniesDataAdd)

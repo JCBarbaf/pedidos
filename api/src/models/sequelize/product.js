@@ -6,20 +6,57 @@ module.exports = function (sequelize, DataTypes) {
       primaryKey: true,
       allowNull: false
     },
+    productCategoryId: {
+      type: DataTypes.INTEGER
+    },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notNull: {
-          msg: 'Por favor, rellena el campo "name".'
+          msg: 'Por favor, rellena el campo "Nombre".'
+        },
+        notEmpty: {
+          msg: 'Por favor, rellena el campo "Nombre".'
         }
       }
     },
-    featured: {
-      type: DataTypes.BOOLEAN
+    reference: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'Por favor, rellena el campo "Referencia".'
+        },
+        notEmpty: {
+          msg: 'Por favor, rellena el campo "Referencia".'
+        }
+      }
+    },
+    units: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'Por favor, rellena el campo "Unidades".'
+        },
+        notEmpty: {
+          msg: 'Por favor, rellena el campo "Unidades".'
+        }
+      }
+    },
+    measurementUnit: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    measurement: {
+      type: DataTypes.INTEGER,
+      allowNull: true
     },
     visible: {
-      type: DataTypes.BOOLEAN
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -50,17 +87,22 @@ module.exports = function (sequelize, DataTypes) {
         fields: [
           { name: 'id' }
         ]
+      },
+      {
+        name: 'products_productCategoryId_fk',
+        using: 'BTREE',
+        fields: [
+          { name: 'productCategoryId' }
+        ]
       }
     ]
   })
 
   Product.associate = function (models) {
-    Product.hasMany(models.CartDetail, { as: 'cartDetails', foreignKey: 'productId' })
+    Product.belongsTo(models.ProductCategory, { as: 'productCategory', foreignKey: 'productCategoryId' })
     Product.hasMany(models.Price, { as: 'prices', foreignKey: 'productId' })
-    Product.hasMany(models.ReturnDetail, { as: 'returnDetails', foreignKey: 'productId' })
+    Product.hasOne(models.Price, { as: 'price', foreignKey: 'productId', scope: { current: true } })
     Product.hasMany(models.SaleDetail, { as: 'saleDetails', foreignKey: 'productId' })
-    Product.hasMany(models.ProductCategoryRelation, { as: 'productCategoryRelations', foreignKey: 'productId' })
-    Product.belongsToMany(models.ProductCategory, { through: models.ProductCategoryRelation, as: 'productCategories', foreignKey: 'productId' })
   }
 
   return Product

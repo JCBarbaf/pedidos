@@ -1,36 +1,47 @@
+import isEqual from 'lodash-es/isEqual'
+import { store } from '../redux/store.js'
 class Cart extends HTMLElement {
   constructor () {
     super()
     this.shadow = this.attachShadow({ mode: 'open' })
+    this.unsubscribe = null
   }
 
   connectedCallback () {
-    this.products = [
-      {
-        name: 'Buzz cola light',
-        price: 10.00,
-        units: 16,
-        measure: 330,
-        measureUnit: 'ml',
-        quantity: 3
-      },
-      {
-        name: 'Buzz cola con limón',
-        price: 20.00,
-        units: 16,
-        measure: 330,
-        measureUnit: 'ml',
-        quantity: 2
-      },
-      {
-        name: 'Buzz cola',
-        price: 30.55,
-        units: 16,
-        measure: 330,
-        measureUnit: 'ml',
-        quantity: 1
+    // this.products = [
+    //   {
+    //     name: 'Buzz cola light',
+    //     price: 10.00,
+    //     units: 16,
+    //     measure: 330,
+    //     measureUnit: 'ml',
+    //     quantity: 3
+    //   },
+    //   {
+    //     name: 'Buzz cola con limón',
+    //     price: 20.00,
+    //     units: 16,
+    //     measure: 330,
+    //     measureUnit: 'ml',
+    //     quantity: 2
+    //   },
+    //   {
+    //     name: 'Buzz cola',
+    //     price: 30.55,
+    //     units: 16,
+    //     measure: 330,
+    //     measureUnit: 'ml',
+    //     quantity: 1
+    //   }
+    // ]
+    this.unsubscribe = store.subscribe(() => {
+      const currentState = store.getState()
+
+      if (!isEqual(currentState.cart.cartProducts, this.products)) {
+        this.products = currentState.cart.cartProducts
+        this.updateCart(this.products)
       }
-    ]
+    })
     this.render()
   }
 
@@ -44,10 +55,65 @@ class Cart extends HTMLElement {
           box-sizing: border-box;
           font-size: 1.25rem;
         }
-        .products {
-          height: 90vh;
+        .order-button {
+          width: 15rem;
+          position: fixed;
+          bottom: 2vh;
+          left: 0;
+          right: 0;
+          margin: 1rem auto;
+          padding: 1rem;
+          background-color: var(--primary-color, rgb(0, 56, 168));
+          color: var(--white, rgb(203, 219, 235));
+          font: inherit;
+          border: none;
+          border-radius: 100rem;
+          box-shadow: var(--sahdow, 5px 5px 0px 0px rgba(0, 0, 0, 0.2));
+          text-decoration: none;
+          text-align: center;
+          z-index: 50;
+        }
+        .cart-container {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          justify-content: flex-end;
+          overflow: hidden;
+          z-index: 100;
+          pointer-events: none;
+        }
+        .cart {
+          width: 100%;
+          max-width: 30rem;
+          height: 100%;
           display: flex;
           flex-direction: column;
+          background-color: var(--secondary-color, rgb(94, 55, 81));
+          border-left: var(--border, 3px solid rgba(0, 0, 0, 0.2));
+          transform: translateX(100%);
+          transition: transform 0.3s ease-in;
+          pointer-events: all;
+          &.active {
+            transform: translateX(0);
+          }
+        }
+        .cart-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1rem;
+          background-color: var(--primary-color, rgb(0, 56, 168));
+          border-bottom: var(--border, 3px solid rgba(0, 0, 0, 0.2));
+        }
+        .close {
+          background: none;
+          color:inherit;
+          border: none;
+          font: inherit;
+          cursor: pointer;
+          &:hover {
+            transform: scale(1.1);
+          }
         }
         .product-gallery {
           display: flex;
@@ -89,7 +155,7 @@ class Cart extends HTMLElement {
           font-size: 2rem;
           text-align: center;
         }
-        .order-button {
+        .buy-button {
           width: 15rem;
           margin: 1rem auto;
           padding: 1rem;
@@ -115,6 +181,7 @@ class Cart extends HTMLElement {
           justify-content: center;
           align-items: center;
           background-color: rgba(0,0,0,0.4);
+          z-index: 200;
           &.active {
             visibility: visible;
           }
@@ -131,7 +198,7 @@ class Cart extends HTMLElement {
           text-align: center;
         }
         .active .modal {
-          animation: drop 0.3s ease-in forwards;
+          animation: drop 0.3s ease-in-out forwards;
         }
         .modal-header {
           display: flex;
@@ -181,10 +248,17 @@ class Cart extends HTMLElement {
           }
         }
       </style>
-      <div class="products">
-        <div class="product-gallery"></div>
-        <p class="total">Total: ${this.products.reduce((sum, product) => sum + (product.price * product.quantity), 0)}€</p>
-        <button class="order-button">Finalizar pedido</button>
+      <button class="order-button">Ver pedido</button>
+      <div class="cart-container">
+        <div class="cart">
+          <header class="cart-header">
+            <h3>Tu pedido</h3>
+            <button class="close">X</button>
+          </header>
+          <div class="product-gallery"></div>
+          <p class="total">Total: ${this.products ? this.products.reduce((sum, product) => sum + (product.price * product.quantity), 0) : 0}€</p>
+          <button class="buy-button">Finalizar pedido</button>
+        </div>
       </div>
       <div class="modal-background">
         <div class="modal">
@@ -199,7 +273,31 @@ class Cart extends HTMLElement {
         </div>
       </div>
       `
-    this.products.forEach(product => {
+    const modal = this.shadow.querySelector('.modal-background')
+    this.shadow.addEventListener('click', (event) => {
+      if (event.target.closest('.order-button')) {
+        event.preventDefault()
+        this.shadow.querySelector('.cart').classList.add('active')
+      }
+      if (event.target.closest('.close')) {
+        event.preventDefault()
+        this.shadow.querySelector('.cart').classList.remove('active')
+      }
+      if (event.target.closest('.buy-button')) {
+        event.preventDefault()
+        modal.classList.add('active')
+      }
+    })
+    modal.addEventListener('click', (event) => {
+      if (!event.target.closest('.modal') || event.target.closest('.close-modal')) {
+        modal.classList.remove('active')
+      }
+    })
+  }
+
+  updateCart (products) {
+    this.shadow.querySelector('.product-gallery').innerHTML = ''
+    products?.forEach(product => {
       const productContainer = document.createElement('div')
       const name = document.createElement('p')
       const price = document.createElement('p')
@@ -219,16 +317,6 @@ class Cart extends HTMLElement {
       productContainer.appendChild(details)
       productContainer.appendChild(quantity)
       this.shadow.querySelector('.product-gallery').appendChild(productContainer)
-    })
-    const modal = this.shadow.querySelector('.modal-background')
-    this.shadow.querySelector('.order-button').addEventListener('click', (event) => {
-      event.preventDefault()
-      modal.classList.add('active')
-    })
-    modal.addEventListener('click', (event) => {
-      if (!event.target.closest('.modal') || event.target.closest('.close-modal')) {
-        modal.classList.remove('active')
-      }
     })
   }
 }
