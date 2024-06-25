@@ -8,33 +8,12 @@ class Products extends HTMLElement {
   }
 
   connectedCallback () {
-    this.products = [
-      {
-        id: 1,
-        name: 'Buzz cola light',
-        price: 10.00,
-        units: 16,
-        measure: 330,
-        measureUnit: 'ml'
-      },
-      {
-        id: 2,
-        name: 'Buzz cola con limón',
-        price: 10.00,
-        units: 16,
-        measure: 330,
-        measureUnit: 'ml'
-      },
-      {
-        id: 3,
-        name: 'Buzz cola',
-        price: 10.00,
-        units: 16,
-        measure: 330,
-        measureUnit: 'ml'
-      }
-    ]
-    this.render()
+    this.loadData().then(() => this.render())
+  }
+
+  async loadData() {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/customer/products`)
+    this.products = await response.json()
   }
 
   render () {
@@ -136,9 +115,9 @@ class Products extends HTMLElement {
       name.classList.add('name')
       name.innerHTML = product.name
       price.classList.add('price')
-      price.innerHTML = `${product.price.toFixed(2)}€`
+      price.innerHTML = product.price != null ? `${product.price.basePrice}€` : `0€`;
       details.classList.add('details')
-      details.innerHTML = `${product.units}u, ${product.measure}${product.measureUnit}`
+      details.innerHTML = `${product.units}u, ${product.measurement}${product.measurementUnit}`
       quantity.classList.add('quantity')
       substract.classList.add('substract')
       substract.innerHTML = '-'

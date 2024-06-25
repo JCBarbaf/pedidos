@@ -1,11 +1,12 @@
 const sequelizeDb = require('../../models/sequelize')
 const Product = sequelizeDb.Product
 const Op = sequelizeDb.Sequelize.Op
+const PriceManagementService = require('../../services/price-management-service.js')
 
 exports.create = (req, res) => {
-  console.log("------------------------------------")
-  console.log(req.body.visible)
   Product.create(req.body).then(data => {
+    const priceManagementService = new PriceManagementService
+    priceManagementService.createPrice(data.id, req.body.price)
     res.status(200).send(data)
   }).catch(err => {
     console.log(err)

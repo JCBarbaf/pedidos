@@ -8,32 +8,6 @@ class Cart extends HTMLElement {
   }
 
   connectedCallback () {
-    // this.products = [
-    //   {
-    //     name: 'Buzz cola light',
-    //     price: 10.00,
-    //     units: 16,
-    //     measure: 330,
-    //     measureUnit: 'ml',
-    //     quantity: 3
-    //   },
-    //   {
-    //     name: 'Buzz cola con limón',
-    //     price: 20.00,
-    //     units: 16,
-    //     measure: 330,
-    //     measureUnit: 'ml',
-    //     quantity: 2
-    //   },
-    //   {
-    //     name: 'Buzz cola',
-    //     price: 30.55,
-    //     units: 16,
-    //     measure: 330,
-    //     measureUnit: 'ml',
-    //     quantity: 1
-    //   }
-    // ]
     this.unsubscribe = store.subscribe(() => {
       const currentState = store.getState()
 
@@ -155,6 +129,9 @@ class Cart extends HTMLElement {
           font-size: 2rem;
           text-align: center;
         }
+        .total-price {
+          font-size: inherit;
+        }
         .buy-button {
           width: 15rem;
           margin: 1rem auto;
@@ -223,7 +200,7 @@ class Cart extends HTMLElement {
           padding: 2rem;
           display: flex;
           flex-direction: column;
-          align-items: stretch;
+          align-items: center;
           gap: 1rem;
           p {
             color: var(--grey-white, rgb(187, 194, 212));
@@ -232,6 +209,17 @@ class Cart extends HTMLElement {
         }
         .modal-title {
           font-size: 1.75rem;
+        }
+        .home-button {
+          padding: 0.75rem 2rem;
+          background-color: var(--primary-color, rgb(0, 56, 168));
+          color: var(--white, rgb(203, 219, 235));
+          border-radius: 20rem;
+          text-decoration: none;
+          &:hover {
+            transform: scale(1.1);
+            filter: brightness(1.1);
+          }
         }
         @keyframes drop {
           0% {
@@ -256,7 +244,7 @@ class Cart extends HTMLElement {
             <button class="close">X</button>
           </header>
           <div class="product-gallery"></div>
-          <p class="total">Total: ${this.products ? this.products.reduce((sum, product) => sum + (product.price * product.quantity), 0) : 0}€</p>
+          <p class="total">Total: <span class="total-price"></span>€</p>
           <button class="buy-button">Finalizar pedido</button>
         </div>
       </div>
@@ -269,12 +257,14 @@ class Cart extends HTMLElement {
           <main class="modal-main">
             <h5 class="modal-title">¡Gracias por comprar con nosotros!</h5>
             <p>Su pedido ha sido realizado con éxito</p>
+            <p>Referencia: <span class="order-reference"></span></p>
+            <a href="/cliente" class="home-button">Volver al inicio</a>
           </main>
         </div>
       </div>
       `
     const modal = this.shadow.querySelector('.modal-background')
-    this.shadow.addEventListener('click', (event) => {
+    this.shadow.addEventListener('click', async (event) => {
       if (event.target.closest('.order-button')) {
         event.preventDefault()
         this.shadow.querySelector('.cart').classList.add('active')
@@ -285,6 +275,19 @@ class Cart extends HTMLElement {
       }
       if (event.target.closest('.buy-button')) {
         event.preventDefault()
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/customer/sales`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // Authorization: 'Bearer ' + localStorage.getItem('customerAccessToken')
+          },
+          body: JSON.stringify({
+            products: this.products
+          })
+        })
+        const data = await response.json()
+        console.log(data)
+        this.shadow.querySelector('.order-reference').innerHTML = data.reference
         modal.classList.add('active')
       }
     })
@@ -293,10 +296,12 @@ class Cart extends HTMLElement {
         modal.classList.remove('active')
       }
     })
+    
   }
 
   updateCart (products) {
     this.shadow.querySelector('.product-gallery').innerHTML = ''
+    let totalPrice = 0
     products?.forEach(product => {
       const productContainer = document.createElement('div')
       const name = document.createElement('p')
@@ -307,17 +312,20 @@ class Cart extends HTMLElement {
       name.classList.add('name')
       name.innerHTML = product.name
       price.classList.add('price')
-      price.innerHTML = `${product.price.toFixed(2)}€`
+      let productPrice = product.price != null ? product.price.basePrice : 0;
+      totalPrice += product.quantity * productPrice
+      price.innerHTML = `${productPrice}€`
       details.classList.add('details')
-      details.innerHTML = `${product.units}u, ${product.measure}${product.measureUnit}`
+      details.innerHTML = `${product.units}u, ${product.measurement}${product.measurementUnit}`
+      quantity.innerHTML = `${product.quantity}x${productPrice}€`
       quantity.classList.add('quantity')
-      quantity.innerHTML = `${product.quantity}x${product.price.toFixed(2)}€`
       productContainer.appendChild(name)
       productContainer.appendChild(price)
       productContainer.appendChild(details)
       productContainer.appendChild(quantity)
       this.shadow.querySelector('.product-gallery').appendChild(productContainer)
     })
+    this.shadow.querySelector('.total-price').innerHTML = totalPrice.toFixed(2)
   }
 }
 

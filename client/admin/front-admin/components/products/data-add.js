@@ -231,6 +231,10 @@ class ProductsDataAdd extends HTMLElement {
                   <label for="user">Referencia:</label>
                   <input type="text" name="reference">
                 </div>
+                <div class="form-field">
+                  <label for="user">Precio:</label>
+                  <input type="text" name="price.basePrice">
+                </div>
                 <div class="form-field checkbox">
                   <input type="checkbox" name="visible">
                   <label for="user">Visible</label>
@@ -304,6 +308,15 @@ class ProductsDataAdd extends HTMLElement {
               formDataJson[prefix][locales] = {}
             }
             formDataJson[prefix][locales][field] = value ?? null
+          } else if(key.includes('price')){
+            const [prefix, price] = key.split('.')
+            if (!(prefix in formDataJson)) {
+              formDataJson[prefix] = {}
+            }
+            if (!(price in formDataJson[prefix])) {
+              formDataJson[prefix][price] = {}
+            }
+            formDataJson[prefix][price]= value ?? null
           } else {
             formDataJson[key] = value ?? null
           }
