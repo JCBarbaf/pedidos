@@ -4,6 +4,51 @@ const Sale = sequelizeDb.Sale
 const SaleDetail = sequelizeDb.SaleDetail
 const Op = sequelizeDb.Sequelize.Op
 
+exports.findByCustomer = (req, res) => {
+  const saleWhereStatement = {}
+  saleWhereStatement.deletedAt = { [Op.is]: null }
+  saleWhereStatement.customerId = 1
+
+  for (const key in req.query) {
+    if (req.query[key] !== '' && req.query[key] !== 'null' && key !== 'page' && key !== 'size') {
+      saleWhereStatement[key] = { [Op.substring]: req.query[key] }
+    }
+  }
+
+
+  Sale.findAll({
+    where: saleWhereStatement,
+    order: [['createdAt', 'DESC']]
+  })
+  .then(result => {
+    res.status(200).send(result)
+  }).catch(err => {
+    console.log('---------------error-------------',err)
+    res.status(500).send({
+      message: err.errors || 'Algún error ha surgido al recuperar los datos.'
+    })
+  })
+}
+
+exports.findSaleDetails = (req, res) => {
+  const saleWhereStatement = {}
+  saleWhereStatement.deletedAt = { [Op.is]: null }
+  saleWhereStatement.saleId = req.params.saleId
+
+  SaleDetail.findAll({
+    where: saleWhereStatement,
+    order: [['createdAt', 'DESC']]
+  })
+  .then(result => {
+    res.status(200).send(result)
+  }).catch(err => {
+    console.log('---------------error-------------',err)
+    res.status(500).send({
+      message: err.errors || 'Algún error ha surgido al recuperar los datos.'
+    })
+  })
+}
+
 exports.create = async (req, res) => {
   try {
     const productsIds = req.body.products.map(product => product.id)

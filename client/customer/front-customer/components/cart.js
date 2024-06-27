@@ -90,9 +90,6 @@ class Cart extends HTMLElement {
           }
         }
         .product-gallery {
-          display: flex;
-          align-items: flex-start;
-          flex-wrap: wrap;
           flex: 1;
           overflow: auto;
         }

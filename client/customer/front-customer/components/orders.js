@@ -2,32 +2,16 @@ class Order extends HTMLElement {
   constructor () {
     super()
     this.shadow = this.attachShadow({ mode: 'open' })
+    this.customerId = 1
   }
 
   connectedCallback () {
-    this.orders = [
-      {
-        reference: 10101011010,
-        total: 180.00,
-        dateTime: new Date('2024-6-10 12:55')
-      },
-      {
-        reference: 10101011011,
-        total: 10.00,
-        dateTime: new Date('2024-6-11 6:30')
-      },
-      {
-        reference: 10101011012,
-        total: 250.00,
-        dateTime: new Date('2024-7-20 1:00')
-      },
-      {
-        reference: 10101011013,
-        total: 1080.00,
-        dateTime: new Date('2020-6-10 00:00')
-      }
-    ]
-    this.render()
+    this.loadData().then(() => this.render())
+  }
+
+  async loadData() {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}${this.getAttribute('endpoint')}`)
+    this.orders = await response.json()
   }
 
   render () {
@@ -92,6 +76,7 @@ class Order extends HTMLElement {
           background-color: var(--primary-color, rgb(0, 56, 168));
           border-top: var(--border, 3px solid rgba(0, 0, 0, 0.2));
           border-radius: 0 0 1rem 1rem;
+          cursor: pointer;
         }
         .arrow-down {
           --size: 1rem;
@@ -133,7 +118,7 @@ class Order extends HTMLElement {
           font-size: 1rem;
           color: var(--grey, rgb(113, 117, 129));
         }
-        .button {
+        .details-button {
           grid-area: button;
           display: flex;
           justify-content: center;
@@ -141,10 +126,16 @@ class Order extends HTMLElement {
           padding: 0.5rem;
           background-color: var(--primary-color, rgb(0, 56, 168));
           color: var(--white, rgb(203, 219, 235));
+          border: none;
           border-radius: 100rem;
           font: inherit;
           font-size: 1rem;
           text-decoration: none;
+          cursor: pointer;
+          &:hover {
+            transform: scale(1.1);
+            filter: brightness(1.1);
+          }
         }
         .order-button {
           width: 15rem;
@@ -158,13 +149,102 @@ class Order extends HTMLElement {
           text-decoration: none;
           text-align: center;
         }
+        .details-background {
+          opacity: 0;
+          background-color: rgba(0, 0, 0,0.2);
+          position: absolute;
+          inset: 0;
+          display: flex;
+          justify-content: flex-end;
+          overflow: hidden;
+          z-index: 500;
+          pointer-events: none;
+          transition: opacity 0.3s ease-in;
+          &:has(.active) {
+            opacity: 1;
+            pointer-events: all;
+          }
+        }
+        .details {
+          width: 100%;
+          max-width: 30rem;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          background-color: var(--secondary-color, rgb(94, 55, 81));
+          border-left: var(--border, 3px solid rgba(0, 0, 0, 0.2));
+          transform: translateX(100%);
+          transition: transform 0.3s ease-in;
+          &.active {
+            transform: translateX(0);
+          }
+        }
+        .details-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1rem;
+          background-color: var(--primary-color, rgb(0, 56, 168));
+          border-bottom: var(--border, 3px solid rgba(0, 0, 0, 0.2));
+        }
+        .close {
+          background: none;
+          color:inherit;
+          border: none;
+          font: inherit;
+          cursor: pointer;
+          &:hover {
+            transform: scale(1.1);
+          }
+        }
+        .product-gallery {
+          flex: 1;
+          overflow: auto;
+        }
+        .product {
+          width: 22rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin: 1rem auto;
+          padding: 1rem;
+          border-bottom: var(--border, 3px solid rgba(0, 0, 0, 0.2));
+        }
+        .details-total {
+          padding: 1rem;
+          border-block: var(--border, 3px solid rgba(0, 0, 0, 0.2));
+          border-color: var(--white, rgb(203, 219, 235));
+          font-size: 2rem;
+          text-align: center;
+        }
+        .details-total-price {
+          font-size: inherit;
+        }
+        .refound-button {
+          width: 15rem;
+          margin: 1rem auto;
+          padding: 1rem;
+          background-color: var(--primary-color, rgb(0, 56, 168));
+          color: var(--white, rgb(203, 219, 235));
+          font: inherit;
+          border: none;
+          border-radius: 100rem;
+          box-shadow: var(--sahdow, 5px 5px 0px 0px rgba(0, 0, 0, 0.2));
+          text-decoration: none;
+          text-align: center;
+          cursor: pointer;
+          &:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+          }
+        }
       </style>
       <div class="orders">
         <div class="filters">
           <div class="filter-content">
             <div class="filter-inputs">
               <input type="text" name="reference" class="reference-filter" placeholder="Referencia">
-              <input type="date" name="date" class="date-filter">
+              <input type="date" name="saleDate" class="date-filter">
             </div>
           </div>
           <div class="open-filters">
@@ -176,22 +256,60 @@ class Order extends HTMLElement {
         </div>
         <div class="order-gallery"></div>
       </div>
+      <div class="details-background">
+        <div class="details">
+          <header class="details-header">
+            <h5>Detalles</h5>
+            <button class="close">X</button>
+          </header>
+          <div class="product-gallery"></div>
+          <div class="details-total">Total: <span class="details-total-price"></span>€</div>
+          <button class="refound-button">Devolver pedido</button>
+        </div>
+      </div>
       `
+    this.LoadOrders()
+    const details = this.shadow.querySelector('.details')
+    this.shadow.addEventListener('click', async (event) => {
+      if (event.target.closest('.open-filters')) {
+        const filters = event.target.closest('.filters')
+        if(filters.classList.contains('opened')) {
+          const reference = this.shadow.querySelector('[name="reference"]').value.trim() == '' ? null : this.shadow.querySelector('[name="reference"]').value
+          const saleDate = this.shadow.querySelector('[name="saleDate"]').value.trim() == '' ? null : this.shadow.querySelector('[name="saleDate"]').value
+          // console.log(reference, saleDate)
+          const response = await fetch(`${import.meta.env.VITE_API_URL}${this.getAttribute('endpoint')}?reference=${reference}&saleDate=${saleDate}`)
+          this.orders = await response.json()
+          console.log(this.orders)
+          this.LoadOrders()
+        }
+        filters.classList.toggle('opened')
+      }
+      if (event.target.closest('.details-button')) {
+        this.LoadSaledetails(event.target.closest('.details-button').dataset.saleId)
+        details.classList.add('active')
+      }
+      if (event.target.closest('.close') || (event.target.closest('.details-background') && !event.target.closest('.details'))) {
+        details.classList.remove('active')
+      }
+    })
+  }
+  LoadOrders() {
+    this.shadow.querySelector('.order-gallery').innerHTML = ""
     this.orders.forEach(order => {
       const orderContainer = document.createElement('div')
       const reference = document.createElement('p')
       const total = document.createElement('p')
       const dateTime = document.createElement('p')
-      const button = document.createElement('a')
+      const button = document.createElement('button')
       orderContainer.classList.add('order')
       reference.classList.add('reference')
       reference.innerHTML = order.reference
       total.classList.add('total')
-      total.innerHTML = `${order.total.toFixed(2)}€`
+      total.innerHTML = `${order.totalBasePrice}€`
       dateTime.classList.add('dateTime')
-      dateTime.innerHTML = `${String(order.dateTime.getDate()).padStart(2, '0')}/${String(order.dateTime.getMonth() + 1).padStart(2, '0')}/${order.dateTime.getFullYear()} ${String(order.dateTime.getHours()).padStart(2, '0')}:${String(order.dateTime.getMinutes()).padStart(2, '0')}`
-      button.classList.add('button')
-      button.href = '#'
+      dateTime.innerHTML = `${order.saleDate} ${order.saleTime}`
+      button.classList.add('details-button')
+      button.dataset.saleId = order.id
       button.innerHTML = 'Ver pedido'
       orderContainer.appendChild(reference)
       orderContainer.appendChild(total)
@@ -199,10 +317,30 @@ class Order extends HTMLElement {
       orderContainer.appendChild(button)
       this.shadow.querySelector('.order-gallery').appendChild(orderContainer)
     })
-    this.shadow.querySelector('.open-filters').addEventListener('click', (event) => {
-      console.log(event.target.parentNode)
-      event.target.closest('.filters').classList.toggle('opened')
+  }
+  async LoadSaledetails(saleId) {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}${this.getAttribute('endpoint')}/details/${saleId}`)
+    const saleDetails = await response.json()
+    const productGallery = this.shadow.querySelector('.product-gallery')
+    let totalPrice = 0
+    productGallery.innerHTML = ""
+    saleDetails.forEach(saleDetail => {
+      const productContainer = document.createElement('div')
+      const productName = document.createElement('p')
+      const productSale = document.createElement('p')
+      productContainer.classList.add('product')
+      productName.classList.add('product-name')
+      productName.innerHTML = saleDetail.productName
+      productSale.classList.add('product-sale')
+      productSale.innerHTML = `${saleDetail.quantity} x ${saleDetail.basePrice}€`
+      totalPrice += saleDetail.quantity * saleDetail.basePrice
+      productContainer.appendChild(productName)
+      productContainer.appendChild(productSale)
+      productGallery.appendChild(productContainer)
     })
+    this.shadow.querySelector('.details-total-price').innerHTML = totalPrice.toFixed(2)
+    this.shadow.querySelector('.refound-button').dataset.saleId = saleId
+
   }
 }
 
