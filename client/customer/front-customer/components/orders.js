@@ -238,6 +238,91 @@ class Order extends HTMLElement {
             filter: brightness(1.1);
           }
         }
+        .modal-background {
+          visibility: hidden;
+          position: fixed;
+          inset: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background-color: rgba(0,0,0,0.4);
+          z-index: 200;
+          &.active {
+            visibility: visible;
+          }
+        }
+        .modal {
+          max-width: 90%;
+          width: 50rem;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+          overflow: hidden;
+          background-color: var(--secondary-color, rgb(94, 55, 81));
+          border-radius: 1rem;
+          text-align: center;
+        }
+        .active .modal {
+          animation: drop 0.3s ease-in-out forwards;
+        }
+        .modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin: 0;
+          padding: 1rem;
+          background-color: var(--primary-color, rgb(0, 56, 168));
+          border-bottom: var(--border, 3px solid rgba(0, 0, 0, 0.2));
+        }
+        .close-modal {
+          background: none;
+          color: inherit;
+          border: none;
+          font: inherit;
+          cursor: pointer;
+          &:hover {
+            transform: scale(1.1);
+          }
+        }
+        .modal-main {
+          padding: 2rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+          p {
+            color: var(--grey-white, rgb(187, 194, 212));
+            font-size: 1.2rem;
+          }
+        }
+        .modal-title {
+          font-size: 1.75rem;
+        }
+        .home-button {
+          padding: 0.75rem 2rem;
+          background-color: var(--primary-color, rgb(0, 56, 168));
+          color: var(--white, rgb(203, 219, 235));
+          border-radius: 20rem;
+          text-decoration: none;
+          &:hover {
+            transform: scale(1.1);
+            filter: brightness(1.1);
+          }
+        }
+        @keyframes drop {
+          0% {
+            transform: translateY(-100vh);
+          }
+          80% {
+            transform: translateY(10vh);
+          }
+          95% {
+            transform: translateY(-1vh);
+          }
+          100% {
+            transform: translateY(0);
+          }
+        }
       </style>
       <div class="orders">
         <div class="filters">
@@ -267,6 +352,19 @@ class Order extends HTMLElement {
           <button class="refound-button">Devolver pedido</button>
         </div>
       </div>
+      <div class="modal-background">
+        <div class="modal">
+          <header class="modal-header">
+            <h3>Devolución realizada</h3>
+            <button class="close-modal">x</button>
+          </header>
+          <main class="modal-main">
+            <h5 class="modal-title">¡La petición de su devolución se ha realizado con éxito!</h5>
+            <p>Su devolución será procesada en los proximos dias.</p>
+            <p>Referencia: <span class="order-reference"></span></p>
+          </main>
+        </div>
+      </div>
       `
     this.LoadOrders()
     const details = this.shadow.querySelector('.details')
@@ -290,6 +388,19 @@ class Order extends HTMLElement {
       }
       if (event.target.closest('.close') || (event.target.closest('.details-background') && !event.target.closest('.details'))) {
         details.classList.remove('active')
+      }
+      if (event.target.closest('.refound-button')) {
+        const saleId = event.target.closest('.refound-button').dataset.saleId
+        console.log(saleId)
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/customer/returns/${saleId}`, {
+          method: 'post'
+        })
+        const data = await response.json()
+        this.shadow.querySelector('.modal-background').classList.add('active')
+        this.shadow.querySelector('.order-reference').innerHTML = data.reference
+      }
+      if (event.target.closest('.close-modal') || (event.target.closest('.modal-background') && !event.target.closest('.modal'))) {
+        this.shadow.querySelector('.modal-background').classList.remove('active')
       }
     })
   }

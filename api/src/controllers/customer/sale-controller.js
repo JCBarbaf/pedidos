@@ -77,7 +77,7 @@ exports.create = async (req, res) => {
     const totalBasePrice = products.reduce((sum, product) => {
       return sum + (product.price && product.price.basePrice ? product.price.basePrice * product.quantity : 0)
     }, 0)
-    const reference = `${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}${String(new Date().getHours()).padStart(2, '0')}${String(new Date().getMinutes()).padStart(2, '0')}${String(2).padStart(3, '0')}`
+    const reference = `${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}${String(new Date().getHours()).padStart(2, '0')}${String(new Date().getMinutes()).padStart(2, '0')}${String(Math.floor(Math.random() * 999) + 1).padStart(3, '0')}`
     const saleData = {
       customerId: 1,
       reference: reference,

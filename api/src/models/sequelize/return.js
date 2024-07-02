@@ -1,11 +1,14 @@
 module.exports = function (sequelize, DataTypes) {
-  const Sale = sequelize.define('Sale',
+  const Return = sequelize.define('Return',
     {
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
         allowNull: false
+      },
+      saleId: {
+        type: DataTypes.INTEGER
       },
       customerId: {
         type: DataTypes.INTEGER
@@ -18,11 +21,11 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false
       },
-      saleDate: {
+      returnDate: {
         type: DataTypes.DATEONLY,
         allowNull: false
       },
-      saleTime: {
+      returnTime: {
         type: DataTypes.TIME,
         allowNull: false
       },
@@ -44,7 +47,7 @@ module.exports = function (sequelize, DataTypes) {
       }
     }, {
       sequelize,
-      tableName: 'sales',
+      tableName: 'returns',
       timestamps: true,
       paranoid: true,
       indexes: [
@@ -57,7 +60,14 @@ module.exports = function (sequelize, DataTypes) {
           ]
         },
         {
-          name: 'sales_customerId_fk',
+          name: 'returns_saleId_fk',
+          using: 'BTREE',
+          fields: [
+            { name: 'saleId' }
+          ]
+        },
+        {
+          name: 'returns_customerId_fk',
           using: 'BTREE',
           fields: [
             { name: 'customerId' }
@@ -67,12 +77,12 @@ module.exports = function (sequelize, DataTypes) {
     }
   )
 
-  Sale.associate = function (models) {
-    Sale.belongsTo(models.Customer, { as: 'customer', foreignKey: 'customerId' })
-    Sale.hasMany(models.SaleDetail, { as: 'saleDetails', foreignKey: 'saleId' })
-    Sale.hasMany(models.Return, { as: 'return', foreignKey: 'saleId' })
-    Sale.belongsToMany(models.Product, { through: models.SaleDetail, as: 'products', foreignKey: 'saleId' })
+  Return.associate = function (models) {
+    Return.belongsTo(models.Customer, { as: 'customer', foreignKey: 'customerId' })
+    Return.belongsTo(models.Sale, { as: 'sale', foreignKey: 'saleId' })
+    // Return.hasMany(models.ReturnDetail, { as: 'returnDetails', foreignKey: 'returnId' })
+    // Return.belongsToMany(models.Product, { through: models.ReturnDetail, as: 'products', foreignKey: 'returnId' })
   }
 
-  return Sale
+  return Return
 }
