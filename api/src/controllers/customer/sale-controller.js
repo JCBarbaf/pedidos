@@ -2,32 +2,51 @@ const sequelizeDb = require('../../models/sequelize')
 const Product = sequelizeDb.Product
 const Sale = sequelizeDb.Sale
 const SaleDetail = sequelizeDb.SaleDetail
+const Return = sequelizeDb.Return
 const Op = sequelizeDb.Sequelize.Op
 
-exports.findByCustomer = (req, res) => {
-  const saleWhereStatement = {}
-  saleWhereStatement.deletedAt = { [Op.is]: null }
-  saleWhereStatement.customerId = 1
-
-  for (const key in req.query) {
-    if (req.query[key] !== '' && req.query[key] !== 'null' && key !== 'page' && key !== 'size') {
-      saleWhereStatement[key] = { [Op.substring]: req.query[key] }
+exports.findByCustomer = async (req, res) => {
+  try {
+    const saleWhereStatement = {}
+    saleWhereStatement.deletedAt = { [Op.is]: null }
+    saleWhereStatement.customerId = 1
+  
+    for (const key in req.query) {
+      if (req.query[key] !== '' && req.query[key] !== 'null' && key !== 'page' && key !== 'size') {
+        saleWhereStatement[key] = { [Op.substring]: req.query[key] }
+      }
     }
-  }
-
-
-  Sale.findAll({
-    where: saleWhereStatement,
-    order: [['createdAt', 'DESC']]
-  })
-  .then(result => {
-    res.status(200).send(result)
-  }).catch(err => {
-    console.log('---------------error-------------',err)
-    res.status(500).send({
-      message: err.errors || 'Algún error ha surgido al recuperar los datos.'
+  
+    let sales = await Sale.findAll({
+      where: saleWhereStatement,
+      order: [['createdAt', 'DESC']]
     })
-  })
+
+    sales = sales.map(sale => sale.get({ plain: true }))
+    
+    const saleIds = sales.map(sale => sale.id);
+
+    const returnWhereStatement = {}
+    returnWhereStatement.deletedAt = { [Op.is]: null }
+    returnWhereStatement.saleId = { [Op.in]: saleIds }
+
+    const returns = await Return.findAll({
+      where: returnWhereStatement,
+      attributes: ['saleId']
+    })
+    
+    const returnedSaleIds = new Set(returns.map(returnRecord => returnRecord.saleId))
+    
+    sales.forEach(sale => {
+      sale.returned = returnedSaleIds.has(sale.id)
+    })
+    res.status(200).send(sales)
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({
+      message: error.errors || 'Algún error ha surgido al recuperar los datos.'
+    })
+  }
 }
 
 exports.findSaleDetails = (req, res) => {
@@ -77,7 +96,7 @@ exports.create = async (req, res) => {
     const totalBasePrice = products.reduce((sum, product) => {
       return sum + (product.price && product.price.basePrice ? product.price.basePrice * product.quantity : 0)
     }, 0)
-    const reference = `${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}${String(new Date().getHours()).padStart(2, '0')}${String(new Date().getMinutes()).padStart(2, '0')}${String(Math.floor(Math.random() * 999) + 1).padStart(3, '0')}`
+    const reference = `S-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}${String(new Date().getHours()).padStart(2, '0')}${String(new Date().getMinutes()).padStart(2, '0')}${String(Math.floor(Math.random() * 999) + 1).padStart(3, '0')}`
     const saleData = {
       customerId: 1,
       reference: reference,

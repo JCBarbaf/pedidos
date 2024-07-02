@@ -12,6 +12,7 @@ class Order extends HTMLElement {
   async loadData() {
     const response = await fetch(`${import.meta.env.VITE_API_URL}${this.getAttribute('endpoint')}`)
     this.orders = await response.json()
+    console.log(this.orders)
   }
 
   render () {
@@ -98,13 +99,21 @@ class Order extends HTMLElement {
           width: 22rem;
           display: grid;
           grid-template-areas: 
+          "returnTag returnTag returnTag"
           "reference reference total"
-          "dateTime dateTime button";
+          "dateTime dateTime button"
+          ;
           gap: 1rem;
           margin: 1rem auto;
           padding: 1rem;
           border-bottom: var(--border, 3px solid rgba(0, 0, 0, 0.2));
           border-color: var(--white, rgb(203, 219, 235));
+          &.returned {
+            border-color: var(--red, rgb(153, 31, 24));
+            .return-tag {
+              visibility: visible;
+            }
+          }
         }
         .reference {
           grid-area: reference;
@@ -137,6 +146,14 @@ class Order extends HTMLElement {
             filter: brightness(1.1);
           }
         }
+        .return-tag {
+          grid-area: returnTag;
+          visibility: hidden;
+          padding: 0.25rem;
+          background-color: var(--red, rgb(153, 31, 24));
+          border-radius: 1rem 1rem 0.25rem 0.25rem;
+          text-align: center;
+        }
         .order-button {
           width: 15rem;
           margin: 1rem auto;
@@ -157,7 +174,7 @@ class Order extends HTMLElement {
           display: flex;
           justify-content: flex-end;
           overflow: hidden;
-          z-index: 500;
+          z-index: 200;
           pointer-events: none;
           transition: opacity 0.3s ease-in;
           &:has(.active) {
@@ -220,7 +237,7 @@ class Order extends HTMLElement {
         .details-total-price {
           font-size: inherit;
         }
-        .refound-button {
+        .return-button {
           width: 15rem;
           margin: 1rem auto;
           padding: 1rem;
@@ -233,6 +250,10 @@ class Order extends HTMLElement {
           text-decoration: none;
           text-align: center;
           cursor: pointer;
+          &:disabled {
+            background-color: var(--grey, rgb(113, 117, 129));
+            pointer-events: none;
+          }
           &:hover {
             transform: scale(1.05);
             filter: brightness(1.1);
@@ -246,7 +267,7 @@ class Order extends HTMLElement {
           justify-content: center;
           align-items: center;
           background-color: rgba(0,0,0,0.4);
-          z-index: 200;
+          z-index: 500;
           &.active {
             visibility: visible;
           }
@@ -349,7 +370,7 @@ class Order extends HTMLElement {
           </header>
           <div class="product-gallery"></div>
           <div class="details-total">Total: <span class="details-total-price"></span>€</div>
-          <button class="refound-button">Devolver pedido</button>
+          <button class="return-button">Devolver pedido</button>
         </div>
       </div>
       <div class="modal-background">
@@ -383,21 +404,23 @@ class Order extends HTMLElement {
         filters.classList.toggle('opened')
       }
       if (event.target.closest('.details-button')) {
-        this.LoadSaledetails(event.target.closest('.details-button').dataset.saleId)
+        this.LoadSaledetails(event.target.closest('.details-button').dataset.saleId, event.target.closest('.details-button').dataset.returned)
         details.classList.add('active')
       }
       if (event.target.closest('.close') || (event.target.closest('.details-background') && !event.target.closest('.details'))) {
         details.classList.remove('active')
       }
-      if (event.target.closest('.refound-button')) {
-        const saleId = event.target.closest('.refound-button').dataset.saleId
-        console.log(saleId)
+      if (event.target.closest('.return-button')) {
+        const saleId = event.target.closest('.return-button').dataset.saleId
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/customer/returns/${saleId}`, {
           method: 'post'
         })
         const data = await response.json()
+        this.shadow.querySelector('.details').classList.remove('active')
         this.shadow.querySelector('.modal-background').classList.add('active')
         this.shadow.querySelector('.order-reference').innerHTML = data.reference
+        await this.loadData()
+        this.LoadOrders()
       }
       if (event.target.closest('.close-modal') || (event.target.closest('.modal-background') && !event.target.closest('.modal'))) {
         this.shadow.querySelector('.modal-background').classList.remove('active')
@@ -405,6 +428,7 @@ class Order extends HTMLElement {
     })
   }
   LoadOrders() {
+    console.log('hola')
     this.shadow.querySelector('.order-gallery').innerHTML = ""
     this.orders.forEach(order => {
       const orderContainer = document.createElement('div')
@@ -412,7 +436,9 @@ class Order extends HTMLElement {
       const total = document.createElement('p')
       const dateTime = document.createElement('p')
       const button = document.createElement('button')
+      const returnedTag = document.createElement('p')
       orderContainer.classList.add('order')
+      if (order.returned) orderContainer.classList.add('returned')
       reference.classList.add('reference')
       reference.innerHTML = order.reference
       total.classList.add('total')
@@ -421,15 +447,19 @@ class Order extends HTMLElement {
       dateTime.innerHTML = `${order.saleDate} ${order.saleTime}`
       button.classList.add('details-button')
       button.dataset.saleId = order.id
+      if (order.returned) button.dataset.returned = true
       button.innerHTML = 'Ver pedido'
+      returnedTag.classList.add('return-tag')
+      returnedTag.innerHTML = 'Devolución'
       orderContainer.appendChild(reference)
       orderContainer.appendChild(total)
       orderContainer.appendChild(dateTime)
       orderContainer.appendChild(button)
+      orderContainer.appendChild(returnedTag)
       this.shadow.querySelector('.order-gallery').appendChild(orderContainer)
     })
   }
-  async LoadSaledetails(saleId) {
+  async LoadSaledetails(saleId, returned) {
     const response = await fetch(`${import.meta.env.VITE_API_URL}${this.getAttribute('endpoint')}/details/${saleId}`)
     const saleDetails = await response.json()
     const productGallery = this.shadow.querySelector('.product-gallery')
@@ -450,8 +480,8 @@ class Order extends HTMLElement {
       productGallery.appendChild(productContainer)
     })
     this.shadow.querySelector('.details-total-price').innerHTML = totalPrice.toFixed(2)
-    this.shadow.querySelector('.refound-button').dataset.saleId = saleId
-
+    this.shadow.querySelector('.return-button').dataset.saleId = saleId
+    this.shadow.querySelector('.return-button').disabled = returned ? true: false
   }
 }
 

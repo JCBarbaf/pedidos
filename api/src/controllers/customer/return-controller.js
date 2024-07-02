@@ -12,21 +12,23 @@ exports.create = async (req, res) => {
     const saleData = await Sale.findOne({
       where: saleWhereStatement
     })
+    const reference = `R-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}${String(new Date().getHours()).padStart(2, '0')}${String(new Date().getMinutes()).padStart(2, '0')}${String(Math.floor(Math.random() * 999) + 1).padStart(3, '0')}`
 
     const returnData = {
       saleId: req.params.saleId,
       customerId: saleData.customerId,
-      reference: saleData.reference,
+      reference: reference,
       totalBasePrice: saleData.totalBasePrice,
       returnDate: new Date().toISOString().slice(0, 10),
       returnTime: new Date().toTimeString().slice(0, 8)
     }
 
-    console.log('--------data-----', returnData)
+    const [result, created] = await Return.findOrCreate({
+      where: { saleId: req.params.saleId },
+      defaults: returnData
+    })
 
-    const result = await Return.create(returnData)
-
-    res.status(200).send(result)
+    if(created) res.status(200).send(result)
   } catch (err) {
     console.log(err)
     res.status(500).send({
