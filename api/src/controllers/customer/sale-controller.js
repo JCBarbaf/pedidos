@@ -3,6 +3,7 @@ const Product = sequelizeDb.Product
 const Sale = sequelizeDb.Sale
 const SaleDetail = sequelizeDb.SaleDetail
 const Return = sequelizeDb.Return
+const Customer = sequelizeDb.Customer
 const Op = sequelizeDb.Sequelize.Op
 
 exports.findByCustomer = async (req, res) => {
@@ -117,6 +118,22 @@ exports.create = async (req, res) => {
       return saleDetailData
     })
     await SaleDetail.bulkCreate(saleDetailsData)
+
+    const customer = await Customer.findByPk(req.customerId)
+
+    const saleInfo = {
+      sale,
+      customer,
+      saleDetailsData
+    }
+
+    req.redisClient.publish('new-sale', JSON.stringify({
+      userId: req.customerId,
+      userType: 'customer',
+      template: 'order-details',
+      saleInfo
+    }))
+
     res.status(200).send(sale)
   } catch (err) {
     console.log(err)

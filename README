@@ -1,0 +1,7 @@
+En consola, después de hacer npm install
+
+npx puppeteer browsers install chrome
+
+En CMD
+
+icacls %USERPROFILE%/.cache/puppeteer/chrome /grant *S-1-15-2-1:(OI)(CI)(RX)
