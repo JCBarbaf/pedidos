@@ -5,13 +5,32 @@ class PageComponent extends HTMLElement {
     this.basePath = this.getAttribute('base-path') || ''
   }
 
-  connectedCallback () {
+  async connectedCallback () {
+    await this.getRoutes()
     this.render()
     window.onpopstate = () => this.handleRouteChange()
   }
 
   handleRouteChange () {
     this.render()
+  }
+
+  async getRoutes(){
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/customer/routes`, {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('customerAccessToken'),
+      },
+    })
+
+    if (response.ok) {
+      this.routes = await response.json()
+    } else {
+      const data = await response.json()
+
+      if (data.redirection) {
+        window.location.href = data.redirection
+      }
+    }
   }
 
   render () {
@@ -26,7 +45,7 @@ class PageComponent extends HTMLElement {
       '/cliente/pedidos': 'orders.html'
     }
 
-    const filename = routes[path] || '404.html'
+    const filename = this.routes[path] || '404.html'
 
     await this.loadPage(filename)
   }

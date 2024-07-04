@@ -275,6 +275,7 @@ class Cart extends HTMLElement {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/customer/sales`, {
           method: 'POST',
           headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('customerAccessToken'),
             'Content-Type': 'application/json',
             // Authorization: 'Bearer ' + localStorage.getItem('customerAccessToken')
           },

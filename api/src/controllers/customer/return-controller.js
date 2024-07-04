@@ -16,7 +16,7 @@ exports.create = async (req, res) => {
 
     const returnData = {
       saleId: req.params.saleId,
-      customerId: saleData.customerId,
+      customerId: req.customerId,
       reference: reference,
       totalBasePrice: saleData.totalBasePrice,
       returnDate: new Date().toISOString().slice(0, 10),

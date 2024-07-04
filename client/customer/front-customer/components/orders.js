@@ -10,7 +10,11 @@ class Order extends HTMLElement {
   }
 
   async loadData() {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}${this.getAttribute('endpoint')}`)
+    const response = await fetch(`${import.meta.env.VITE_API_URL}${this.getAttribute('endpoint')}`,{
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('customerAccessToken'),
+      },
+    })
     this.orders = await response.json()
     console.log(this.orders)
   }
@@ -396,7 +400,11 @@ class Order extends HTMLElement {
           const reference = this.shadow.querySelector('[name="reference"]').value.trim() == '' ? null : this.shadow.querySelector('[name="reference"]').value
           const saleDate = this.shadow.querySelector('[name="saleDate"]').value.trim() == '' ? null : this.shadow.querySelector('[name="saleDate"]').value
           // console.log(reference, saleDate)
-          const response = await fetch(`${import.meta.env.VITE_API_URL}${this.getAttribute('endpoint')}?reference=${reference}&saleDate=${saleDate}`)
+          const response = await fetch(`${import.meta.env.VITE_API_URL}${this.getAttribute('endpoint')}?reference=${reference}&saleDate=${saleDate}`,{
+            headers: {
+              Authorization: 'Bearer ' + localStorage.getItem('customerAccessToken'),
+            },
+          })
           this.orders = await response.json()
           console.log(this.orders)
           this.LoadOrders()
@@ -412,7 +420,11 @@ class Order extends HTMLElement {
       }
       if (event.target.closest('.return-button')) {
         const saleId = event.target.closest('.return-button').dataset.saleId
+        
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/customer/returns/${saleId}`, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('customerAccessToken'),
+          },
           method: 'post'
         })
         const data = await response.json()
@@ -460,7 +472,11 @@ class Order extends HTMLElement {
     })
   }
   async LoadSaledetails(saleId, returned) {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}${this.getAttribute('endpoint')}/details/${saleId}`)
+    const response = await fetch(`${import.meta.env.VITE_API_URL}${this.getAttribute('endpoint')}/details/${saleId}`,{
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('customerAccessToken'),
+      },
+    })
     const saleDetails = await response.json()
     const productGallery = this.shadow.querySelector('.product-gallery')
     let totalPrice = 0

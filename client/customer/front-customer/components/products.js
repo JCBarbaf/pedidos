@@ -12,7 +12,11 @@ class Products extends HTMLElement {
   }
 
   async loadData() {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}${this.getAttribute('endpoint')}`)
+    const response = await fetch(`${import.meta.env.VITE_API_URL}${this.getAttribute('endpoint')}`,{
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('customerAccessToken'),
+      },
+    })
     this.products = await response.json()
   }
 

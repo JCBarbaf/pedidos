@@ -9,7 +9,7 @@ exports.findByCustomer = async (req, res) => {
   try {
     const saleWhereStatement = {}
     saleWhereStatement.deletedAt = { [Op.is]: null }
-    saleWhereStatement.customerId = 1
+    saleWhereStatement.customerId = req.customerId
   
     for (const key in req.query) {
       if (req.query[key] !== '' && req.query[key] !== 'null' && key !== 'page' && key !== 'size') {

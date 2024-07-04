@@ -135,7 +135,7 @@ class Login extends HTMLElement {
     const formDataJson = Object.fromEntries(formData.entries())
 
     try {
-      const result = await fetch(`${endpoint}/api/auth/user/signin`, {
+      const result = await fetch(`${endpoint}/api/auth/customer/signin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -145,6 +145,7 @@ class Login extends HTMLElement {
 
       if (result.ok) {
         const data = await result.json()
+        localStorage.setItem('customerAccessToken', data.customerAccessToken)
         window.location.href = data.redirection
       } else {
         const error = await result.json()
