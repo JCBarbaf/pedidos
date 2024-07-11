@@ -5,6 +5,7 @@ const SaleDetail = sequelizeDb.SaleDetail
 const Return = sequelizeDb.Return
 const Customer = sequelizeDb.Customer
 const Op = sequelizeDb.Sequelize.Op
+const GraphService = require('../../services/graph-service.js')
 
 exports.findByCustomer = async (req, res) => {
   try {
@@ -106,6 +107,22 @@ exports.create = async (req, res) => {
       saleTime: new Date().toTimeString().slice(0, 8)
     }
     const sale = await Sale.create(saleData)
+
+    const graphService = new GraphService()
+
+    await graphService.createNode('Sale', {
+      id: sale.dataValues.id, 
+      reference: sale.reference, 
+      totalBasePrice: sale.totalBasePrice, 
+      saleDate: sale.saleDate,
+      saleTime: sale.saleTime
+    })
+
+    await graphService.createRelation('Customer', 'PURCHASED', 'Sale', {
+      entityId : req.customerId,
+      relatedEntityId: sale.dataValues.id
+    })
+
     const saleDetailsData = products.map(product => {
       const saleDetailData = {
         saleId: sale.dataValues.id,
@@ -117,6 +134,25 @@ exports.create = async (req, res) => {
       }
       return saleDetailData
     })
+    
+    saleDetailsData.forEach(async saleDetail => {
+      await graphService.createRelation('Product', 'PART_OF', 'Sale', {
+        entityId : saleDetail.productId,
+        relatedEntityId: saleDetail.saleId,
+        properties: {
+          quantity: saleDetail.quantity
+        }
+      })
+
+      await graphService.createRelation('Customer', 'PURCHASED', 'Product', {
+        entityId : req.customerId,
+        relatedEntityId: saleDetail.productId,
+        properties: {
+          quantity: saleDetail.quantity
+        }
+      })
+    });
+
     await SaleDetail.bulkCreate(saleDetailsData)
 
     const customer = await Customer.findByPk(req.customerId)

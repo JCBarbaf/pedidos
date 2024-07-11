@@ -1,9 +1,13 @@
 const sequelizeDb = require('../../models/sequelize')
 const Customer = sequelizeDb.Customer
 const Op = sequelizeDb.Sequelize.Op
+const GraphService = require('../../services/graph-service')
 
 exports.create = (req, res) => {
   Customer.create(req.body).then(async data => {
+    const graphService = new GraphService()
+    await graphService.createNode('Customer', {id: data.id, email: data.email} )
+
     req.redisClient.publish('new-customer', JSON.stringify(data))
     res.status(200).send(data)
   }).catch(err => {

@@ -2,11 +2,20 @@ const sequelizeDb = require('../../models/sequelize')
 const Product = sequelizeDb.Product
 const Op = sequelizeDb.Sequelize.Op
 const PriceManagementService = require('../../services/price-management-service.js')
+const GraphService = require('../../services/graph-service.js')
 
 exports.create = (req, res) => {
-  Product.create(req.body).then(data => {
+  Product.create(req.body).then(async data => {
     const priceManagementService = new PriceManagementService
     priceManagementService.createPrice(data.id, req.body.price)
+
+    const graphService = new GraphService()
+    await graphService.createNode('Product', {id: data.id, name: data.name, reference: data.reference, price: req.body.price.basePrice} )
+    await graphService.createRelation('Product', 'BELONGS_TO', 'ProductCategory', {
+      entityId : data.id,
+      relatedEntityId: req.body.productCategoryId
+    })
+    
     res.status(200).send(data)
   }).catch(err => {
     console.log(err)
