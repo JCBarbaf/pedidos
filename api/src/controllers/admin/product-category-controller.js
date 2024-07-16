@@ -6,7 +6,7 @@ const GraphService = require('../../services/graph-service')
 exports.create = (req, res) => {
   ProductCategory.create(req.body).then(async data => {
     const graphService = new GraphService()
-    await graphService.createNode('ProductCategory', {id: data.id, name: data.name} )
+    await graphService.createNode('ProductCategory', {id: parseInt(data.id), name: data.name} )
 
     res.status(200).send(data)
   }).catch(err => {
@@ -67,8 +67,12 @@ exports.update = (req, res) => {
 
   ProductCategory.update(req.body, {
     where: { id }
-  }).then(([numberRowsAffected]) => {
+  }).then(async ([numberRowsAffected]) => {
     if (numberRowsAffected === 1) {
+
+      const graphService = new GraphService()
+      await graphService.createNode('ProductCategory', {id: parseInt(id), name: req.body.name} )
+
       res.status(200).send({
         message: 'El elemento ha sido actualizado correctamente.'
       })

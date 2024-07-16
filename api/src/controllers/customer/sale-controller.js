@@ -111,7 +111,7 @@ exports.create = async (req, res) => {
     const graphService = new GraphService()
 
     await graphService.createNode('Sale', {
-      id: sale.dataValues.id, 
+      id: parseInt(sale.dataValues.id), 
       reference: sale.reference, 
       totalBasePrice: sale.totalBasePrice, 
       saleDate: sale.saleDate,
@@ -119,15 +119,15 @@ exports.create = async (req, res) => {
     })
 
     await graphService.createRelation('Customer', 'PURCHASED', 'Sale', {
-      entityId : req.customerId,
-      relatedEntityId: sale.dataValues.id
+      entityId : parseInt(req.customerId),
+      relatedEntityId: parseInt(sale.dataValues.id)
     })
 
     const saleDetailsData = products.map(product => {
       const saleDetailData = {
-        saleId: sale.dataValues.id,
-        productId: product.id,
-        priceId: product.price.dataValues.id,
+        saleId: parseInt(sale.dataValues.id),
+        productId: parseInt(product.id),
+        priceId: parseInt(product.price.dataValues.id),
         productName: product.name,
         basePrice: product.price.dataValues.basePrice,
         quantity: product.quantity
@@ -135,23 +135,15 @@ exports.create = async (req, res) => {
       return saleDetailData
     })
     
-    saleDetailsData.forEach(async saleDetail => {
-      await graphService.createRelation('Product', 'PART_OF', 'Sale', {
-        entityId : saleDetail.productId,
-        relatedEntityId: saleDetail.saleId,
+    for (const saleDetail of saleDetailsData) {
+      await graphService.createRelation('Sale', 'CONTAINS', 'Product', {
+        entityId: parseInt(saleDetail.saleId),
+        relatedEntityId: parseInt(saleDetail.productId),
         properties: {
           quantity: saleDetail.quantity
         }
       })
-
-      await graphService.createRelation('Customer', 'PURCHASED', 'Product', {
-        entityId : req.customerId,
-        relatedEntityId: saleDetail.productId,
-        properties: {
-          quantity: saleDetail.quantity
-        }
-      })
-    });
+    }
 
     await SaleDetail.bulkCreate(saleDetailsData)
 
@@ -163,12 +155,12 @@ exports.create = async (req, res) => {
       saleDetailsData
     }
 
-    req.redisClient.publish('new-sale', JSON.stringify({
-      userId: req.customerId,
-      userType: 'customer',
-      template: 'order-details',
-      saleInfo
-    }))
+    // req.redisClient.publish('new-sale', JSON.stringify({
+    //   userId: req.customerId,
+    //   userType: 'customer',
+    //   template: 'order-details',
+    //   saleInfo
+    // }))
 
     res.status(200).send(sale)
   } catch (err) {

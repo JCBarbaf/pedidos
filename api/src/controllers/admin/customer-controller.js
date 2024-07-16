@@ -6,7 +6,7 @@ const GraphService = require('../../services/graph-service')
 exports.create = (req, res) => {
   Customer.create(req.body).then(async data => {
     const graphService = new GraphService()
-    await graphService.createNode('Customer', {id: data.id, email: data.email} )
+    await graphService.createNode('Customer', {id: parseInt(data.id), email: data.email} )
 
     req.redisClient.publish('new-customer', JSON.stringify(data))
     res.status(200).send(data)
@@ -84,8 +84,12 @@ exports.update = (req, res) => {
 
   Customer.update(req.body, {
     where: { id }
-  }).then(([numberRowsAffected]) => {
+  }).then(async ([numberRowsAffected]) => {
     if (numberRowsAffected === 1) {
+
+      const graphService = new GraphService()
+      await graphService.createNode('Customer', {id: parseInt(id), email: req.body.email} )
+
       res.status(200).send({
         message: 'El elemento ha sido actualizado correctamente.'
       })
@@ -95,6 +99,7 @@ exports.update = (req, res) => {
       })
     }
   }).catch(_ => {
+    console.log(_)
     res.status(500).send({
       message: 'Algún error ha surgido al actualiazar la id=' + id
     })

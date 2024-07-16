@@ -10,10 +10,10 @@ exports.create = (req, res) => {
     priceManagementService.createPrice(data.id, req.body.price)
 
     const graphService = new GraphService()
-    await graphService.createNode('Product', {id: data.id, name: data.name, reference: data.reference, price: req.body.price.basePrice} )
+    await graphService.createNode('Product', {id: parseInt(data.id), name: data.name, reference: data.reference, price: req.body.price.basePrice} )
     await graphService.createRelation('Product', 'BELONGS_TO', 'ProductCategory', {
-      entityId : data.id,
-      relatedEntityId: req.body.productCategoryId
+      entityId : parseInt(data.id),
+      relatedEntityId: parseInt(req.body.productCategoryId)
     })
     
     res.status(200).send(data)
@@ -28,7 +28,7 @@ exports.create = (req, res) => {
 exports.findAll = (req, res) => {
 
   const page = req.query.page || 1
-  const limit = parseInt(req.query.size) || 10
+  const limit = parseInt(req.query.size) || 100
   const offset = (page - 1) * limit
 
   Product.findAndCountAll({
@@ -76,8 +76,16 @@ exports.update = (req, res) => {
 
   Product.update(req.body, {
     where: { id }
-  }).then(([numberRowsAffected]) => {
+  }).then(async ([numberRowsAffected]) => {
     if (numberRowsAffected === 1) {
+
+      const graphService = new GraphService()
+      await graphService.createNode('Product', {id: parseInt(id), name: req.body.name, reference: req.body.reference, price: req.body.price.basePrice} )
+      await graphService.createRelation('Product', 'BELONGS_TO', 'ProductCategory', {
+        entityId : parseInt(id),
+        relatedEntityId: parseInt(req.body.productCategoryId)
+      })
+
       res.status(200).send({
         message: 'El elemento ha sido actualizado correctamente.'
       })
